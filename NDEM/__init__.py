@@ -5,12 +5,29 @@ from PIL import Image
 
 class Data:
     @staticmethod
-    def from_image(path):
+    def from_image(path, shape: tuple[int, int] | None = None):
+        """
+        It takes a path to an image, and returns a Data object
+
+        :param path: The path to the image file
+        :param shape: The shape of the image. If None, the shape will be the same as the image
+        :type shape: tuple[int, int] | None
+        :return: A Data object with the image and shape
+        """
         path = pl.Path(path)
         image = Image.open(path).convert('L')
-        return Data(image, image.size[::-1])
 
-    def __init__(self, data, shape=None):
+        if shape is None:
+            shape = image.size[::-1]
+
+        return Data(image, shape)
+
+    def __init__(self, data: Image.Image | np.ndarray | str, shape: tuple[int, int] | None = None):
+        """
+        :param data: The data to be stored in the Image object
+        :type data: Image.Image | np.ndarray | str
+        :param shape: The shape of the image. If not specified, it will be determined from the data
+        """
         self.__data = np.zeros((1, 0), dtype=int)
         self.__image = None
         self.__string = None
@@ -28,6 +45,11 @@ class Data:
     @property
     def shape(self):
         return self.__shape
+
+    @shape.setter
+    def shape(self, shape):
+        self.__shape = shape
+        self.data = self.__data
 
     @property
     def string(self):
